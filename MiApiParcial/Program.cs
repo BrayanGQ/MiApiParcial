@@ -1,25 +1,24 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configurar para Railway - usar el puerto que Railway asigne
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
+// Habilitar Swagger siempre (para pruebas del parcial)
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthorization();
-
 app.MapControllers();
+
+// Ruta raíz que redirija a swagger
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.Run();
